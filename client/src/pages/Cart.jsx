@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAppContext } from "../context/AppContext";
 import { assets, dummyAddress } from '../assets/assets';
 import toast from 'react-hot-toast';
+import { useLocation } from 'react-router-dom';
 
 const Cart = () => {
   const {
@@ -81,11 +82,15 @@ const Cart = () => {
     }
   };
 
-  useEffect(() => {
-    if (user) {
-      getUserAddress()
-    }
-  }, [user]);
+const location = useLocation();
+
+useEffect(() => {
+  if (user && user._id) {
+    getUserAddress();
+  }
+}, [user?._id, location.pathname]);
+
+
 
   return (
     <div className="flex flex-col md:flex-row mt-16">

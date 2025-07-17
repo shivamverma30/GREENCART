@@ -67,7 +67,7 @@ const Cart = () => {
     try {
       const { data } = await axios.get('/api/address/get', {
         params: { userId: user._id }
-      });
+      },{withCredentials: true});
       if (data.success) {
         if (Array.isArray(data.addresses) && data.addresses.length > 0) {
           setAddresses(data.addresses);

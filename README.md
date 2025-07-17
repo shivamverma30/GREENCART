@@ -46,38 +46,7 @@
 
 ---
 
-<details> <summary><strong>📁 Click to Expand: Folder Structure</strong></summary>
-greencart/
-├── client/                 # React frontend
-│   ├── public/
-│   └── src/
-│       ├── assets/
-│       ├── components/
-│       │   ├── SellerNavbar.js
-│       │   ├── CustomerNavbar.js
-│       │   ├── CartComponent.js
-│       │   └── ...
-│       ├── context/
-│       │   └── MainContext.js
-│       ├── pages/
-│       │   ├── Home.js
-│       │   ├── Cart.js
-│       │   └── ...
-│       ├── App.jsx
-│       ├── main.jsx
-│       └── index.css
-├── server/                 # Node.js backend
-│   ├── config/
-│   ├── controllers/
-│   ├── middleware/
-│   ├── models/
-│   ├── routes/
-│   ├── server.js
-│   └── .env
-└── README.md
-</details>
-
-
+<pre> <details> <summary>📁 <strong>Click to Expand: Folder Structure</strong></summary> ```text greencart/ ├── client/ # React frontend │ ├── public/ │ └── src/ │ ├── assets/ │ ├── components/ │ │ ├── SellerNavbar.js │ │ ├── CustomerNavbar.js │ │ ├── CartComponent.js │ │ └── ... │ ├── context/ │ │ └── MainContext.js │ ├── pages/ │ │ ├── Home.js │ │ ├── Cart.js │ │ └── ... │ ├── App.jsx │ ├── main.jsx │ └── index.css ├── server/ # Node.js backend │ ├── config/ │ ├── controllers/ │ ├── middleware/ │ ├── models/ │ ├── routes/ │ ├── server.js │ └── .env └── README.md ``` </details> </pre>
 ## 🛠️ Installation & Development
 
 Follow the steps below to run the project locally:

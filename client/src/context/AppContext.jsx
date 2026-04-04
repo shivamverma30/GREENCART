@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import axios from "axios";
+import { generatedUiProducts } from "../assets/assets";
 
 axios.defaults.withCredentials = true;
 axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL;
@@ -16,8 +17,15 @@ export const AppContextProvider = ({ children }) => {
   const [isSeller, setIsSeller] = useState(false);
   const [showUserLogin, setShowUserLogin] = useState(false);
   const [products, setProducts] = useState([]);
+  const [productsLoading, setProductsLoading] = useState(true);
   const [cartItems, setCartItems] = useState({});
-  const [searchQuery, setSearchQuery] = useState({});
+  const [addresses, setAddresses] = useState([]);
+  const [addressesLoading, setAddressesLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    const savedTheme = localStorage.getItem("greencart-theme");
+    return savedTheme === "dark";
+  });
 
   // Fetch seller status
   const fetchSeller = async () => {
@@ -36,24 +44,93 @@ export const AppContextProvider = ({ children }) => {
       if (data.success) {
         setUser(data.user);
         setCartItems(data.user.cartItems);
+        fetchAddresses(data.user._id);
       }
     } catch {
       setUser(null);
+      setAddresses([]);
+    }
+  };
+
+  // Fetch all addresses for active user
+  const fetchAddresses = async (userIdOverride) => {
+    const targetUserId = userIdOverride || user?._id;
+    if (!targetUserId) return [];
+
+    setAddressesLoading(true);
+    try {
+      const { data } = await axios.get("/api/address/get", {
+        params: { userId: targetUserId },
+      });
+
+      if (data.success && Array.isArray(data.addresses)) {
+        setAddresses(data.addresses);
+        return data.addresses;
+      }
+
+      return [];
+    } catch (error) {
+      toast.error(error.message);
+      return [];
+    } finally {
+      setAddressesLoading(false);
+    }
+  };
+
+  // Add user address and immediately sync in context
+  const addUserAddress = async (addressData) => {
+    if (!user?._id) {
+      return { success: false, message: "Please login first" };
+    }
+
+    try {
+      const { data } = await axios.post("/api/address/add", {
+        address: addressData,
+        userId: user._id,
+      });
+
+      if (!data.success) {
+        return data;
+      }
+
+      const updatedAddresses = await fetchAddresses(user._id);
+      const latestAddress = updatedAddresses[updatedAddresses.length - 1] || null;
+
+      return {
+        success: true,
+        message: data.message,
+        address: latestAddress,
+      };
+    } catch (error) {
+      return { success: false, message: error.message };
     }
   };
 
   // Fetch all products
   const fetchProducts = async () => {
+    setProductsLoading(true);
     try {
       const { data } = await axios.get("/api/product/list");
       if (data.success) {
-        setProducts(data.products);
+        if (Array.isArray(data.products) && data.products.length > 0) {
+          setProducts(data.products);
+        } else {
+          setProducts(generatedUiProducts);
+        }
       } else {
         toast.error(data.message);
+        setProducts(generatedUiProducts);
       }
     } catch (error) {
       toast.error(error.message);
+      setProducts(generatedUiProducts);
+    } finally {
+      setProductsLoading(false);
     }
+  };
+
+  const toggleDarkMode = () => {
+    setIsDarkMode((prev) => !prev);
   };
 
   // Add product to cart
@@ -149,6 +226,17 @@ const getCartCount = () => {
     fetchProducts();
   }, []);
 
+  useEffect(() => {
+    const html = document.documentElement;
+    if (isDarkMode) {
+      html.classList.add("dark");
+      localStorage.setItem("greencart-theme", "dark");
+    } else {
+      html.classList.remove("dark");
+      localStorage.setItem("greencart-theme", "light");
+    }
+  }, [isDarkMode]);
+
   const value = {
     navigate,
     user,
@@ -158,20 +246,27 @@ const getCartCount = () => {
     showUserLogin,
     setShowUserLogin,
     products,
+    productsLoading,
     currency,
     addToCart,
     updateCartItem,
     removeFromCart,
     cartItems,
+    addresses,
+    addressesLoading,
     cartArray: getCartArray(), // use function output
     searchQuery,
     setSearchQuery,
+    isDarkMode,
+    toggleDarkMode,
     getCartCount,
     getCartAmount,
     axios,
     fetchProducts,
     handleQuantityChange,
     setCartItems,
+    fetchAddresses,
+    addUserAddress,
   };
 
   return (

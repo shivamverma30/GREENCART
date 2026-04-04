@@ -1,24 +1,22 @@
 import React from 'react';
 import ProductCart from './ProductCart';
 import { useAppContext } from '../context/AppContext';
+import SectionHeader from './ui/SectionHeader';
 
 const BestSeller = () => {
   const { products } = useAppContext();
 
   return (
-    <div className='mt-16'>
-      <p className='text-2xl md:text-3xl font-medium'>Best Sellers</p>
-      
-      {/* Horizontal Scroll Container */}
-      <div className='overflow-x-auto mt-6'>
-        <div className='flex gap-4 min-w-[1000px]'>
+    <div className='mt-16 animate-rise'>
+      <SectionHeader title='Best Sellers' subtitle='Most loved picks by our customers' />
+
+      <div className='mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4'>
           {products
-            .filter((product) => product.inStock)
-            .slice(0, 5)
+            .filter((product) => product.inStock !== false)
+            .slice(0, 4)
             .map((product, index) => (
               <ProductCart key={index} product={product} />
             ))}
-        </div>
       </div>
     </div>
   );

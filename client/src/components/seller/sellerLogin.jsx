@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useAppContext } from '../../context/AppContext';
+import toast from 'react-hot-toast';
 
 const SellerLogin = () => {
   const { isSeller, setIsSeller, navigate,axios} = useAppContext();
@@ -28,31 +29,31 @@ const SellerLogin = () => {
   }, [isSeller]);
 
   return !isSeller && (
-    <form onSubmit={onSubmitHandler} className='min-h-screen flex items-center text-sm text-gray-600'>
-      <div className="flex flex-col gap-5 m-auto items-start p-8 py-12 min-w-80 sm:min-w-88 rounded-lg shadow-xl border border-gray-200">
-        <p className="text-2xl font-medium m-auto">
+    <form onSubmit={onSubmitHandler} className='min-h-screen flex items-center text-sm text-theme-secondary'>
+      <div className="seller-form-card flex min-w-80 flex-col items-start gap-5 p-8 py-12 shadow-xl sm:min-w-88 m-auto">
+        <p className="m-auto text-2xl font-medium text-theme-primary">
           <span className="text-primary">Seller</span> Login
         </p>
 
         <div className="w-full">
-          <p>Email</p>
+          <p className='text-theme-primary'>Email</p>
           <input
             placeholder="enter your email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="border border-gray-200 rounded w-full p-2 mt-1 outline-primary"
+            className="seller-input mt-1 w-full rounded p-2 outline-primary"
             required
           />
         </div>
 
         <div className="w-full">
-          <p>Password</p>
+          <p className='text-theme-primary'>Password</p>
           <input
             type="password"
             placeholder="enter your password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="border border-gray-200 rounded w-full p-2 mt-1 outline-primary"
+            className="seller-input mt-1 w-full rounded p-2 outline-primary"
             required
           />
         </div>

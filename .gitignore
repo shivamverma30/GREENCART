@@ -1,9 +1,28 @@
-# Node modules (both client and server)
+# Dependencies
 node_modules/
 client/node_modules/
 server/node_modules/
 
-# Environment variables
+# Build artifacts
+dist/
+build/
+client/dist/
+server/dist/
+
+# Environment files
 .env
+.env.*
 client/.env
+client/.env.*
 server/.env
+server/.env.*
+
+# Coverage and logs
+coverage/
+*.log
+logs/
+
+# OS / editor files
+.DS_Store
+.vscode/
+.idea/

@@ -1,4 +1,5 @@
 import logo from "./logo.svg";
+import logo_dark from "./logo_dark.svg";
 import search_icon from "./search_icon.svg";
 import remove_icon from "./remove_icon.svg";
 import arrow_right_icon_colored from "./arrow_right_icon_colored.svg";
@@ -6,6 +7,7 @@ import star_icon from "./star_icon.svg";
 import star_dull_icon from "./star_dull_icon.svg";
 import cart_icon from "./cart_icon.svg";
 import nav_cart_icon from "./nav_cart_icon.svg";
+import nav_cart_icon_dark from "./nav_cart_icon_dark.svg";
 import add_icon from "./add_icon.svg";
 import refresh_icon from "./refresh_icon.svg";
 import product_list_icon from "./product_list_icon.svg";
@@ -72,6 +74,7 @@ import barley_image from "./barley_image.png";
 
 export const assets = {
   logo,
+  logo_dark,
   search_icon,
   remove_icon,
   arrow_right_icon_colored,
@@ -79,6 +82,7 @@ export const assets = {
   star_dull_icon,
   cart_icon,
   nav_cart_icon,
+  nav_cart_icon_dark,
   add_icon,
   refresh_icon,
   product_list_icon,
@@ -781,6 +785,95 @@ export const dummyProducts = [
     inStock: true,
   },
 ];
+
+const uiProductSeedCatalog = [
+  {
+    name: "Apple Fresh Pack",
+    category: "Fruits",
+    image: apple_image,
+    price: 149,
+    offerPrice: 129,
+    rating: 4.6,
+    description: ["Crisp premium apples", "Perfect for daily snacks"],
+  },
+  {
+    name: "Banana Family Pack",
+    category: "Fruits",
+    image: banana_image_1,
+    price: 79,
+    offerPrice: 65,
+    rating: 4.4,
+    description: ["Naturally sweet", "Rich in potassium"],
+  },
+  {
+    name: "Amul Milk 1L",
+    category: "Dairy",
+    image: amul_milk_image,
+    price: 75,
+    offerPrice: 67,
+    rating: 4.7,
+    description: ["Farm fresh milk", "Daily essential"],
+  },
+  {
+    name: "Bakery Fresh Collection",
+    category: "Bakery",
+    image: bakery_image,
+    price: 129,
+    offerPrice: 109,
+    rating: 4.5,
+    description: ["Soft baked delights", "Best for breakfast"],
+  },
+  {
+    name: "Basmati Rice 1kg",
+    category: "Grains",
+    image: basmati_rice_image,
+    price: 165,
+    offerPrice: 142,
+    rating: 4.8,
+    description: ["Long aromatic grain", "Ideal for biryani"],
+  },
+  {
+    name: "Barley Nutrition Pack",
+    category: "Grains",
+    image: barley_image,
+    price: 135,
+    offerPrice: 118,
+    rating: 4.3,
+    description: ["High fiber grain", "Healthy diet support"],
+  },
+  {
+    name: "Brown Bread",
+    category: "Bakery",
+    image: brown_bread_image,
+    price: 48,
+    offerPrice: 39,
+    rating: 4.2,
+    description: ["Whole wheat bread", "Soft and fresh"],
+  },
+  {
+    name: "Cold Drinks Combo",
+    category: "Drinks",
+    image: bottles_image,
+    price: 105,
+    offerPrice: 89,
+    rating: 4.5,
+    description: ["Party-ready refreshment", "Assorted fizzy drinks"],
+  },
+];
+
+export const generatedUiProducts = uiProductSeedCatalog.map((item, index) => ({
+  _id: `ui-seed-${index + 1}`,
+  name: item.name,
+  category: item.category,
+  price: item.price,
+  offerPrice: item.offerPrice,
+  image: [item.image],
+  rating: item.rating,
+  inStock: true,
+  description: item.description,
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
+}));
 
 export const dummyAddress = [
   {

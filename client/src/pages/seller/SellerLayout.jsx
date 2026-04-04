@@ -3,14 +3,16 @@ import { useAppContext } from '../../context/AppContext';
 import { assets } from '../../assets/assets';
 import { Link, NavLink, Outlet } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import Button from '../../components/ui/Button';
 
 const SellerLayout = () => {
-  const {axios,navigate } = useAppContext();
+  const {axios,navigate, isDarkMode } = useAppContext();
 
   const sidebarLinks = [
-    { name: 'Add Product', path: '/seller', icon: assets.add_icon },
+    { name: 'Dashboard', path: '/seller/dashboard', icon: assets.order_icon },
+    { name: 'Add Product', path: '/seller/add-product', icon: assets.add_icon },
     { name: 'Product List', path: '/seller/product-list', icon: assets.product_list_icon },
-    { name: 'Orders', path: '/seller/orders', icon: assets.order_icon }, 
+    { name: 'Orders', path: '/seller/orders', icon: assets.order_icon },
   ];
 
   const handleLogout = async() => {
@@ -30,43 +32,47 @@ const SellerLayout = () => {
   return (
     <>
       {/* Topbar */}
-      <div className="flex items-center justify-between px-4 md:px-8 border-b border-gray-300 py-3 bg-white">
+      <div className="seller-topbar sticky top-0 z-30 mx-3 mt-3 flex items-center justify-between rounded-2xl px-4 py-3 md:mx-4 md:px-8">
         <Link to="/">
-          <img src={assets.logo} alt="logo" className="cursor-pointer w-34 md:w-38" />
+          <span className='logo-wrap'>
+            <img src={isDarkMode ? assets.logo_dark : assets.logo} alt="logo" className="cursor-pointer w-34 md:w-38" />
+          </span>
         </Link>
-        <div className="flex items-center gap-5 text-gray-500">
-          <p>Hi! Admin</p>
-          <button onClick={handleLogout} className="border rounded-full text-sm px-4 py-1">
+        <div className="flex items-center gap-5 text-theme-secondary">
+          <p className='font-medium text-theme-primary'>Hi! Admin</p>
+          <Button variant='muted' onClick={handleLogout} className="rounded-full text-sm px-4 py-1">
             Logout
-          </button>
+          </Button>
         </div>
       </div>
 
       {/* Sidebar + Main content */}
-      <div className="flex">
+      <div className="flex gap-3 p-3">
         {/* Sidebar */}
-        <div className="md:w-64 w-16 border-r h-[95vh] text-base border-gray-300 pt-4 flex flex-col bg-white">
+        <div className="seller-sidebar no-scrollbar h-[calc(100vh-98px)] w-16 overflow-y-auto rounded-2xl pt-4 text-base md:w-64">
           {sidebarLinks.map((item) => (
             <NavLink
               to={item.path}
               key={item.name}
               end={item.path === '/seller'}
               className={({ isActive }) =>
-                `flex items-center py-3 px-4 gap-3 transition-all ${
+                `seller-nav-item mx-2 mb-1 flex items-center gap-3 rounded-lg px-4 py-3 transition-all ${
                   isActive
-                    ? 'border-r-4 md:border-r-[6px] bg-primary/10 border-primary text-primary'
-                    : 'hover:bg-gray-100/90 border-white'
+                    ? 'seller-nav-item-active'
+                    : ''
                 }`
               }
             >
-              <img src={item.icon} alt={item.name} className="w-7 h-7" />
-              <p className="md:block hidden">{item.name}</p>
+              <span className="seller-nav-icon-wrap">
+                <img src={item.icon} alt={item.name} className="seller-nav-icon w-5 h-5" />
+              </span>
+              <p className="hidden font-medium md:block">{item.name}</p>
             </NavLink>
           ))}
         </div>
 
         {/* Main Content */}
-        <div className="flex-1 p-4 md:p-6 bg-gray-50 min-h-[95vh]">
+        <div className="seller-main-panel no-scrollbar min-h-[calc(100vh-98px)] flex-1 overflow-y-auto rounded-2xl p-4 md:p-6">
           <Outlet />
         </div>
       </div>

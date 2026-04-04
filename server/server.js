@@ -10,7 +10,8 @@ import productRouter from './routes/productRoute.js'
 import cartRouter from './routes/cartRoute.js'
 import addressRouter from './routes/addressRoute.js';
 import orderRouter from './routes/orderRoute.js';
-import { stripeWebhooks } from './controllers/orderController.js';
+import paymentRouter from './routes/paymentRoute.js';
+import { razorpayWebhookHandler } from './controllers/paymentController.js';
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -21,10 +22,8 @@ await connectCloudinary()
 //allow mutiple origins 
 const allowedOrigins=['http://localhost:5173','https://greencart-three-iota.vercel.app'];
 
-
-app.post('/stripe',express.raw({type: "application/json"}),stripeWebhooks)
-
 //Middleware configuration 
+app.post('/api/payment/webhook', express.raw({ type: 'application/json' }), razorpayWebhookHandler);
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
@@ -42,6 +41,7 @@ app.use('/api/product',productRouter)
 app.use('/api/cart',cartRouter)
 app.use('/api/address',addressRouter)
 app.use('/api/order',orderRouter)
+app.use('/api/payment',paymentRouter)
 
 
 

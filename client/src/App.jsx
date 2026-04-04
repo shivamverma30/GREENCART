@@ -18,13 +18,14 @@ import AddProduct from './pages/seller/AddProduct'
 import ProductList from './pages/seller/ProductList'
 import Orders from './pages/seller/Orders'
 import Loading from './components/Loading'
+import Dashboard from './pages/seller/Dashboard'
 
 
 const App = () => {
   const isSellerPath = useLocation().pathname.includes("seller");
   const {showUserLogin , isSeller}= useAppContext()
   return (
-    <div className='text-default min-h-screen text-gray-700 bg-white'>
+    <div className='text-default min-h-screen'>
 
       { isSellerPath ? null : <Navbar/> }
       {showUserLogin? <Login/> : null }
@@ -43,7 +44,9 @@ const App = () => {
   <Route path='/my-orders' element={<MyOrders/>} />
 
 <Route path="/seller" element={isSeller ? <SellerLayout /> : <SellerLogin />}>
-  <Route index element={isSeller ? <AddProduct /> : null} />
+  <Route index element={isSeller ? <Dashboard /> : null} />
+  <Route path="dashboard" element={<Dashboard />} />
+  <Route path="add-product" element={<AddProduct />} />
   <Route path="product-list" element={<ProductList />} />
   <Route path="orders" element={<Orders />} />
 </Route>

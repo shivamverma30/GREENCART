@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useAppContext } from '../../context/AppContext';
 import toast from 'react-hot-toast';
+import SectionHeader from '../../components/ui/SectionHeader';
+import GlassCard from '../../components/ui/GlassCard';
 
 const ProductList = () => {
   const { products, currency,axios,fetchProducts } = useAppContext();
@@ -22,10 +24,10 @@ const ProductList = () => {
   return (
     <div className="no-scrollbar flex-1 h-[95vh] overflow-y-scroll flex flex-col justify-between">
       <div className="w-full md:p-10 p-4">
-        <h2 className="pb-4 text-lg font-medium">All Products</h2>
-        <div className="flex flex-col items-center max-w-4xl w-full overflow-hidden rounded-md bg-white border border-gray-500/20">
+        <SectionHeader title='Product Management' subtitle='View and update your product inventory' />
+        <GlassCard className="mt-4 flex max-w-4xl w-full flex-col items-center overflow-hidden rounded-xl">
           <table className="md:table-auto table-fixed w-full overflow-hidden">
-            <thead className="text-gray-900 text-sm text-left">
+            <thead className="seller-table-head text-sm text-left">
               <tr>
                 <th className="px-4 py-3 font-semibold truncate">Product</th>
                 <th className="px-4 py-3 font-semibold truncate">Category</th>
@@ -33,12 +35,12 @@ const ProductList = () => {
                 <th className="px-4 py-3 font-semibold truncate">In Stock</th>
               </tr>
             </thead>
-            <tbody className="text-sm text-gray-500">
+            <tbody className="seller-table-body text-sm">
               {products && products.length > 0 ? (
                 products.map((prod) => (
-                  <tr key={prod._id} className="border-t border-gray-500/20">
+                  <tr key={prod._id} className="border-t border-theme">
                     <td className="md:px-4 pl-2 md:pl-4 py-3 flex items-center space-x-3 truncate">
-                      <div className="border border-gray-300 rounded p-2">
+                      <div className="rounded border border-theme bg-theme-card p-2">
                         <img
                           src={prod.image?.[0]}
                           alt="Product"
@@ -60,22 +62,22 @@ const ProductList = () => {
                           className="sr-only peer"
                           defaultChecked
                         />
-                        <div className="w-12 h-7 bg-slate-300 peer-checked:bg-blue-600 rounded-full peer-focus:ring-4 peer-focus:ring-blue-300 transition duration-300"></div>
-                        <div className="absolute left-1 top-1 bg-white w-5 h-5 rounded-full transition-transform duration-300 peer-checked:translate-x-5"></div>
+                        <div className="h-7 w-12 rounded-full bg-slate-300 transition duration-300 peer-checked:bg-primary peer-focus:ring-4 peer-focus:ring-primary/25"></div>
+                        <div className="absolute left-1 top-1 h-5 w-5 rounded-full bg-white transition-transform duration-300 peer-checked:translate-x-5"></div>
                       </label>
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={4} className="text-center py-5 text-gray-400">
+                  <td colSpan={4} className="py-5 text-center text-theme-secondary">
                     No products available.
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
-        </div>
+        </GlassCard>
       </div>
     </div>
   );

@@ -18,7 +18,7 @@ const InputField = ({ type, placeholder, name, handleChange, address }) => {
 };
 
 const AddAddress = () => {
-  const {axios,user,navigate} = useAppContext();
+  const { user, navigate, addUserAddress } = useAppContext();
   const [address, setAddresses] = useState({
     firstName: '',
     lastName: '',
@@ -41,20 +41,17 @@ const AddAddress = () => {
 
 const onSubmitHandler = async (e) => {
   e.preventDefault();
-  try {
-    const { data } = await axios.post('/api/address/add', {
-      address,
-      userId: user._id  // <-- Send userId
-    },{withCredentials: true});
+  const result = await addUserAddress(address);
 
-    if (data.success) {
-      toast.success(data.message);
-      navigate('/cart');
-    } else {
-      toast.error(data.message);
-    }
-  } catch (error) {
-    toast.error(error.message);
+  if (result.success) {
+    toast.success(result.message);
+    navigate('/cart', {
+      state: {
+        selectedAddressId: result.address?._id,
+      },
+    });
+  } else {
+    toast.error(result.message);
   }
 };
 

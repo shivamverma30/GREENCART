@@ -3,9 +3,12 @@ import { NavLink } from 'react-router-dom';
 import { assets } from '../assets/assets';
 import { useAppContext } from '../context/AppContext';
 import toast from 'react-hot-toast';
+import Button from './ui/Button';
 
 const Navbar = () => {
   const [open, setOpen] = React.useState(false);
+  const [dropdownOpen, setDropdownOpen] = React.useState(false);
+  const closeTimeoutRef = React.useRef(null);
   const {
     user,
     setUser,
@@ -13,8 +16,9 @@ const Navbar = () => {
     navigate,
     searchQuery,
     setSearchQuery,
+    isDarkMode,
+    toggleDarkMode,
     getCartCount,
-    getCartAmount,
     axios
   } = useAppContext();
 
@@ -39,31 +43,63 @@ const Navbar = () => {
     }
   }, [searchQuery]);
 
+  useEffect(() => {
+    return () => {
+      if (closeTimeoutRef.current) {
+        clearTimeout(closeTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const openProfileMenu = () => {
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
+    }
+    setDropdownOpen(true);
+  };
+
+  const closeProfileMenuWithDelay = () => {
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+    }
+    closeTimeoutRef.current = setTimeout(() => {
+      setDropdownOpen(false);
+    }, 180);
+  };
+
   return (
-    <nav className="flex items-center justify-between px-6 md:px-16 lg:px-24 xl:px-32 py-4 border-b border-gray-300 bg-white relative transition-all">
+    <nav className="navbar-shell sticky top-0 z-40 flex items-center justify-between px-6 py-4 md:px-16 lg:px-24 xl:px-32 transition-all">
       <NavLink to='/' onClick={() => setOpen(false)}>
-        <img className="h-9" src={assets.logo} alt="logo" />
+        <span className='logo-wrap'>
+          <img className="h-9" src={isDarkMode ? assets.logo_dark : assets.logo} alt="GreenCart logo" />
+        </span>
       </NavLink>
 
       {/* Desktop Menu */}
-      <div className="hidden sm:flex items-center gap-8">
-        <NavLink to='/'>Home</NavLink>
-        <NavLink to='/products'>All Product</NavLink>
-        <NavLink to='/'>Contact</NavLink>
+      <div className="hidden sm:flex items-center gap-8 text-theme-primary">
+        <NavLink to='/' className={({ isActive }) => isActive ? 'text-primary font-medium nav-link-theme' : 'nav-link-theme'}>Home</NavLink>
+        <NavLink to='/products' className={({ isActive }) => isActive ? 'text-primary font-medium nav-link-theme' : 'nav-link-theme'}>All Product</NavLink>
+        <NavLink to='/' className='nav-link-theme'>Contact</NavLink>
 
-        <div className="hidden lg:flex items-center text-sm gap-2 border border-gray-300 px-3 rounded-full">
+        <div className="hidden lg:flex items-center text-sm gap-2 border border-white/25 px-3 rounded-full bg-white/60 dark:bg-white/5 w-72">
           <input
+            value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="py-1.5 w-full bg-transparent outline-none placeholder-gray-500"
+            className="py-1.5 w-full bg-transparent outline-none text-theme-primary placeholder:text-theme-secondary"
             type="text"
             placeholder="Search products"
           />
-          <img src={assets.search_icon} alt="search" className='w-4 h-4' />
+          <img src={assets.search_icon} alt="search" className='icon-theme w-4 h-4' />
         </div>
 
-        <div onClick={() => navigate("/cart")} className="relative cursor-pointer">
-          <img src={assets.nav_cart_icon} alt="cart" className='w-6 opacity-80' />
-          <button className="absolute -top-2 -right-3 text-xs text-white bg-primary w-[18px] h-[18px] rounded-full">
+        <Button variant='muted' onClick={toggleDarkMode} className='rounded-full px-3 py-1.5 text-xs'>
+          {isDarkMode ? '☀️ Light Mode' : '🌙 Dark Mode'}
+        </Button>
+
+        <div onClick={() => navigate("/cart")} className="cart-icon-shell relative cursor-pointer">
+          <img src={isDarkMode ? assets.nav_cart_icon_dark : assets.nav_cart_icon} alt="cart" className='w-6' />
+          <button className="absolute -top-2 -right-3 text-xs text-white bg-primary w-[18px] h-[18px] rounded-full shadow">
             {getCartCount()}
           </button>
         </div>
@@ -76,13 +112,18 @@ const Navbar = () => {
             Login
           </button>
         ) : (
-          <div className='relative group'>
+          <div
+            className='profile-dropdown-wrap relative'
+            onMouseEnter={openProfileMenu}
+            onMouseLeave={closeProfileMenuWithDelay}
+          >
             <img src={assets.profile_icon} className='w-10' alt="profile" />
-            <ul className='hidden group-hover:block absolute top-10 right-0 bg-white shadow border border-gray-200 py-2.5 w-30 rounded-md text-sm z-40'>
-              <li onClick={() => navigate("my-orders")} className='p-1.5 pl-3 hover:bg-primary/10 cursor-pointer'>
+            <span className='profile-menu-bridge' aria-hidden='true'></span>
+            <ul className={`profile-menu ${dropdownOpen ? 'profile-menu-open' : ''}`}>
+              <li onClick={() => navigate("my-orders")} className='profile-menu-item'>
                 My orders
               </li>
-              <li onClick={logout} className='p-1.5 pl-3 hover:bg-primary/10 cursor-pointer'>
+              <li onClick={logout} className='profile-menu-item'>
                 Logout
               </li>
             </ul>
@@ -92,21 +133,34 @@ const Navbar = () => {
 
       {/* Mobile - Cart + Menu Button */}
       <div className='flex items-center gap-6 sm:hidden'>
-        <div onClick={() => navigate("/cart")} className="relative cursor-pointer">
-          <img src={assets.nav_cart_icon} alt="cart" className='w-6 opacity-80' />
+        <div onClick={() => navigate("/cart")} className="cart-icon-shell relative cursor-pointer">
+          <img src={isDarkMode ? assets.nav_cart_icon_dark : assets.nav_cart_icon} alt="cart" className='w-6' />
           <button className="absolute -top-2 -right-3 text-xs text-white bg-primary w-[18px] h-[18px] rounded-full">
             {getCartCount()}
           </button>
         </div>
 
         <button onClick={() => setOpen(!open)} aria-label="Menu">
-          <img src={assets.menu_icon} alt="menu" />
+          <img src={assets.menu_icon} alt="menu" className='icon-theme w-6 h-6' />
         </button>
       </div>
 
       {/* Mobile Menu */}
       {open && (
-        <div className="absolute top-[60px] left-0 w-full bg-white shadow-md py-4 flex-col items-start gap-2 px-5 text-sm md:hidden">
+        <div className="glass-surface absolute top-[60px] left-0 w-full shadow-md py-4 flex flex-col items-start gap-2 px-5 text-sm md:hidden">
+          <div className="flex items-center text-sm gap-2 border border-white/20 px-3 rounded-full bg-white/60 dark:bg-white/5 w-full mb-1">
+            <input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="py-2 w-full bg-transparent outline-none text-theme-primary placeholder:text-theme-secondary"
+              type="text"
+              placeholder="Search products"
+            />
+            <img src={assets.search_icon} alt="search" className='icon-theme w-4 h-4' />
+          </div>
+          <Button variant='muted' onClick={toggleDarkMode} className='rounded-full px-3 py-1.5 text-xs'>
+            {isDarkMode ? '☀️ Light Mode' : '🌙 Dark Mode'}
+          </Button>
           <NavLink to='/' onClick={() => setOpen(false)}>Home</NavLink>
           <NavLink to='/products' onClick={() => setOpen(false)}>All Product</NavLink>
           {user && (

@@ -46,7 +46,7 @@ const resolveImageUrl = (value) => {
     return src;
   }
 
-  const base = import.meta.env.VITE_BACKEND_URL || "";
+  const base = import.meta.env.VITE_API_URL || "";
   if (!base) return src;
 
   const normalizedBase = base.replace(/\/$/, "");

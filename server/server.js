@@ -14,7 +14,6 @@ import paymentRouter from './routes/paymentRoute.js';
 import { razorpayWebhookHandler } from './controllers/paymentController.js';
 
 const app = express();
-const port = process.env.PORT || 4000;
 
 await connectDB()
 await connectCloudinary()
@@ -36,15 +35,14 @@ app.use(cors({
 
 app.get('/',(req,res)=>res.send("API is Working")); 
 app.use('/api/user',userRouter)
+app.use('/api/users',userRouter)
 app.use('/api/seller',sellerRouter)
 app.use('/api/product',productRouter)
+app.use('/api/products',productRouter)
 app.use('/api/cart',cartRouter)
 app.use('/api/address',addressRouter)
 app.use('/api/order',orderRouter)
+app.use('/api/orders',orderRouter)
 app.use('/api/payment',paymentRouter)
 
-
-
-app.listen(port ,()=>{
-    console.log(`Server is running on http://localhost:${port}`)
-})
+export default app;

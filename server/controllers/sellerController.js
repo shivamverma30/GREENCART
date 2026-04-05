@@ -1,10 +1,23 @@
 import jwt from 'jsonwebtoken';
+import { isNonEmptyString, isValidEmail, sanitizeEmail, sanitizeString } from '../utils/validation.js';
 
 //login selleer  :   /api/seller/login 
 export const sellerLogin = async (req, res)=>{
     try{
-        const {email,password}  = req.body;
-    if(password === process.env.SELLER_PASSWORD && email ===process.env.SELLER_EMAIL){
+        const email = sanitizeEmail(req.body?.email);
+        const password = sanitizeString(req.body?.password);
+        const sellerEmail = sanitizeEmail(process.env.SELLER_EMAIL);
+        const sellerPassword = sanitizeString(process.env.SELLER_PASSWORD);
+
+    if (!isNonEmptyString(email) || !isNonEmptyString(password)) {
+      return res.json({ success: false, message: 'Email and password required' });
+    }
+
+    if (!isValidEmail(email)) {
+      return res.json({ success: false, message: 'Invalid email format' });
+    }
+
+    if(password === sellerPassword && email === sellerEmail){
         const token = jwt.sign({email},process.env.JWT_SECRET,{expiresIn:'7d'});
 
             res.cookie('sellerToken',token,{
@@ -15,7 +28,7 @@ export const sellerLogin = async (req, res)=>{
         })
         return res.json({success: true , message: "Logged In"});
     }else{
-        return res.json({success: false , message: "Invalid Cardentials"});
+      return res.json({success: false , message: 'Invalid credentials'});
     }
     }catch(error){
     console.log(error.message);

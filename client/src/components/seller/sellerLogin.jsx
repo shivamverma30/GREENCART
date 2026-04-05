@@ -2,19 +2,49 @@ import React, { useEffect, useState } from 'react';
 import { useAppContext } from '../../context/AppContext';
 import toast from 'react-hot-toast';
 import api from '../../utils/api';
+import { isRequired, isValidEmail, sanitizeInput } from '../../utils/validation';
 
 const SellerLogin = () => {
   const { isSeller, setIsSeller, navigate } = useAppContext();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [touched, setTouched] = useState({});
+  const [submitAttempted, setSubmitAttempted] = useState(false);
+
+  const errors = {
+    ...(isRequired(email) ? {} : { email: 'Email is required' }),
+    ...(isRequired(email) && !isValidEmail(email) ? { email: 'Please enter a valid email address' } : {}),
+    ...(isRequired(password) ? {} : { password: 'Password is required' }),
+  };
+  const isFormValid = Object.keys(errors).length === 0;
+
+  const markTouched = (field) => {
+    setTouched((prev) => ({ ...prev, [field]: true }));
+  };
+
+  const inputClass = (field) => {
+    const showError = Boolean(errors[field]) && (submitAttempted || touched[field]);
+    return `seller-input mt-1 w-full rounded p-2 outline-primary ${showError ? 'border border-red-500 bg-red-50' : ''}`;
+  };
 
   const onSubmitHandler = async (event) => {
     try{
       event.preventDefault();
-      const {data}= await api.post('/api/seller/login',{email,password})
+      setSubmitAttempted(true);
+
+      if (!isFormValid) {
+        toast.error('Please fix form errors before submitting');
+        return;
+      }
+
+      const {data}= await api.post('/api/seller/login',{
+        email: sanitizeInput(email),
+        password: sanitizeInput(password),
+      })
       if(data.success){
         setIsSeller(true)
         navigate('/seller')
+        setSubmitAttempted(false)
       }else{
         toast.error(data.message)
       }
@@ -42,9 +72,14 @@ const SellerLogin = () => {
             placeholder="enter your email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="seller-input mt-1 w-full rounded p-2 outline-primary"
+            onBlur={() => markTouched('email')}
+            className={inputClass('email')}
+            type="email"
             required
           />
+          {errors.email && (submitAttempted || touched.email) && (
+            <p className='mt-1 text-xs text-red-600'>{errors.email}</p>
+          )}
         </div>
 
         <div className="w-full">
@@ -54,12 +89,19 @@ const SellerLogin = () => {
             placeholder="enter your password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="seller-input mt-1 w-full rounded p-2 outline-primary"
+            onBlur={() => markTouched('password')}
+            className={inputClass('password')}
             required
           />
+          {errors.password && (submitAttempted || touched.password) && (
+            <p className='mt-1 text-xs text-red-600'>{errors.password}</p>
+          )}
         </div>
 
-        <button className='bg-primary text-white w-full py-2 rounded-md cursor-pointer'>
+        <button
+          disabled={!isFormValid}
+          className='bg-primary text-white w-full py-2 rounded-md cursor-pointer disabled:cursor-not-allowed disabled:opacity-60'
+        >
           Login
         </button>
       </div>

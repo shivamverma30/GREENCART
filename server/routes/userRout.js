@@ -1,11 +1,32 @@
 import express from 'express';
 import {isAuth, login, logout, register} from '../controllers/userController.js'
 import authUser from '../middlewares/authUser.js';
+import {
+	sanitizeBodyStrings,
+	validateConfirmPassword,
+	validateEmailField,
+	validatePasswordStrength,
+	validateRequiredFields,
+} from '../middlewares/requestValidation.js';
 
 const userRouter = express.Router();
 
-userRouter.post('/register',register)
-userRouter.post('/login',login)
+userRouter.post(
+	'/register',
+	sanitizeBodyStrings,
+	validateRequiredFields(['name', 'email', 'password', 'confirmPassword']),
+	validateEmailField('email'),
+	validatePasswordStrength('password'),
+	validateConfirmPassword('password', 'confirmPassword'),
+	register
+)
+userRouter.post(
+	'/login',
+	sanitizeBodyStrings,
+	validateRequiredFields(['email', 'password']),
+	validateEmailField('email'),
+	login
+)
 userRouter.get('/is-auth' , authUser,isAuth)
 userRouter.get('/logout', authUser,logout)
 

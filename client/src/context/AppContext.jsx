@@ -74,9 +74,7 @@ export const AppContextProvider = ({ children }) => {
 
     setAddressesLoading(true);
     try {
-      const { data } = await api.get("/api/address/get", {
-        params: { userId: targetUserId },
-      });
+      const { data } = await api.get("/api/address/get");
 
       if (data.success && Array.isArray(data.addresses)) {
         setAddresses(data.addresses);

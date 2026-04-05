@@ -12,14 +12,14 @@ const Navbar = () => {
   const closeTimeoutRef = React.useRef(null);
   const {
     user,
-    setUser,
     setShowUserLogin,
     navigate,
     searchQuery,
     setSearchQuery,
     isDarkMode,
     toggleDarkMode,
-    getCartCount
+    getCartCount,
+    clearUserSession
   } = useAppContext();
 
   const logout = async () => {
@@ -27,7 +27,7 @@ const Navbar = () => {
       const {data} = await api.get('/api/user/logout')
       if (data.success) {
         toast.success(data.message)
-         setUser(null);
+         clearUserSession();
          navigate('/');
       } else {
         toast.error(data.message)

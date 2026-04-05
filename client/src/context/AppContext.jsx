@@ -15,7 +15,14 @@ export const AppContextProvider = ({ children }) => {
   const [showUserLogin, setShowUserLogin] = useState(false);
   const [products, setProducts] = useState([]);
   const [productsLoading, setProductsLoading] = useState(true);
-  const [cartItems, setCartItems] = useState({});
+  const [cartItems, setCartItems] = useState(() => {
+    try {
+      const savedCart = localStorage.getItem("cart");
+      return savedCart ? JSON.parse(savedCart) : {};
+    } catch {
+      return {};
+    }
+  });
   const [addresses, setAddresses] = useState([]);
   const [addressesLoading, setAddressesLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -23,6 +30,15 @@ export const AppContextProvider = ({ children }) => {
     const savedTheme = localStorage.getItem("greencart-theme");
     return savedTheme === "dark";
   });
+
+  const clearUserSession = () => {
+    setUser(null);
+    setIsSeller(false);
+    setCartItems({});
+    setAddresses([]);
+    localStorage.removeItem("token");
+    localStorage.removeItem("cart");
+  };
 
   // Fetch seller status
   const fetchSeller = async () => {
@@ -40,12 +56,14 @@ export const AppContextProvider = ({ children }) => {
       const { data } = await api.get("/api/user/is-auth");
       if (data.success) {
         setUser(data.user);
-        setCartItems(data.user.cartItems);
+        setCartItems(data.user.cartItems || {});
+        localStorage.setItem("token", "authenticated");
         fetchAddresses(data.user._id);
+      } else {
+        clearUserSession();
       }
     } catch {
-      setUser(null);
-      setAddresses([]);
+      clearUserSession();
     }
   };
 
@@ -76,26 +94,38 @@ export const AppContextProvider = ({ children }) => {
 
   // Add user address and immediately sync in context
   const addUserAddress = async (addressData) => {
-    if (!user?._id) {
-      return { success: false, message: "Please login first" };
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setShowUserLogin(true);
+      return { success: false, message: "Please login or register first" };
     }
 
     try {
       const { data } = await api.post("/api/address/add", {
         address: addressData,
-        userId: user._id,
       });
 
       if (!data.success) {
         return data;
       }
 
-      const updatedAddresses = await fetchAddresses(user._id);
+      let targetUserId = user?._id;
+      if (!targetUserId) {
+        const authData = await api.get("/api/user/is-auth");
+        if (authData.data?.success) {
+          setUser(authData.data.user);
+          targetUserId = authData.data.user?._id;
+        }
+      }
+
+      const updatedAddresses = targetUserId
+        ? await fetchAddresses(targetUserId)
+        : addresses;
       const latestAddress = updatedAddresses[updatedAddresses.length - 1] || null;
 
       return {
         success: true,
-        message: data.message,
+        message: "Address added successfully",
         address: latestAddress,
       };
     } catch (error) {
@@ -132,6 +162,14 @@ export const AppContextProvider = ({ children }) => {
 
   // Add product to cart
   const addToCart = (itemId) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      toast.error("Please login or register first to add items to cart.");
+      setShowUserLogin(true);
+      navigate("/");
+      return;
+    }
+
     let cartData = structuredClone(cartItems);
     cartData[itemId] = (cartData[itemId] || 0) + 1;
     setCartItems(cartData);
@@ -192,10 +230,14 @@ const getCartCount = () => {
       }
     };
 
-    if (user && Object.keys(cartItems).length > 0) {
+    if (user) {
       updateCart();
     }
   }, [cartItems, user]);
+
+  useEffect(() => {
+    localStorage.setItem("cart", JSON.stringify(cartItems));
+  }, [cartItems]);
 
   // Quantity dropdown handler
   const handleQuantityChange = (e, productId) => {
@@ -263,6 +305,8 @@ const getCartCount = () => {
     setCartItems,
     fetchAddresses,
     addUserAddress,
+    clearUserSession,
+    fetchUser,
   };
 
   return (

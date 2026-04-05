@@ -4,9 +4,10 @@ import { assets } from '../../assets/assets';
 import { Link, NavLink, Outlet } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import Button from '../../components/ui/Button';
+import api from '../../utils/api';
 
 const SellerLayout = () => {
-  const {axios,navigate, isDarkMode } = useAppContext();
+  const {navigate, isDarkMode } = useAppContext();
 
   const sidebarLinks = [
     { name: 'Dashboard', path: '/seller/dashboard', icon: assets.order_icon },
@@ -17,7 +18,7 @@ const SellerLayout = () => {
 
   const handleLogout = async() => {
     try {
-      const {data}=await axios.post('/api/seller/logout');
+      const {data}=await api.post('/api/seller/logout');
       if(data.success){
         toast.success(data.message)
         navigate('/')

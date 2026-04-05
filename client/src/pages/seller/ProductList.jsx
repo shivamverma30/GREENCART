@@ -3,13 +3,14 @@ import { useAppContext } from '../../context/AppContext';
 import toast from 'react-hot-toast';
 import SectionHeader from '../../components/ui/SectionHeader';
 import GlassCard from '../../components/ui/GlassCard';
+import api from '../../utils/api';
 
 const ProductList = () => {
-  const { products, currency,axios,fetchProducts } = useAppContext();
+  const { products, currency,fetchProducts } = useAppContext();
 
   const toggleStock = async (id,inStock)=>{
     try {
-      const {data} = await axios.post('/api/product/stock',{id,inStock});
+      const {data} = await api.post('/api/product/stock',{id,inStock});
       if(data.success){
         fetchProducts();
         toast.success(data.message)

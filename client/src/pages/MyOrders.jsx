@@ -2,14 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { assets } from '../assets/assets';
 import { getProductImage } from '../utils/image';
+import api from '../utils/api';
 
 const MyOrders = () => {
   const [myOrders, setMyOrders] = useState([]);
-  const { currency, axios, user } = useAppContext();
+  const { currency, user } = useAppContext();
 
  const fetchMyOrders = async () => {
   try {
-  const { data } = await axios.get('/api/order/user');
+  const { data } = await api.get('/api/order/user');
      if (data.success) {
        setMyOrders(data.orders);
       }

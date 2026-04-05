@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import axios from "axios";
+import api from "../utils/api";
 import { generatedUiProducts } from "../assets/assets";
 
 export const AppContext = createContext();
@@ -27,7 +27,7 @@ export const AppContextProvider = ({ children }) => {
   // Fetch seller status
   const fetchSeller = async () => {
     try {
-      const { data } = await axios.get("/api/seller/is-auth");
+      const { data } = await api.get("/api/seller/is-auth");
       setIsSeller(data.success);
     } catch {
       setIsSeller(false);
@@ -37,7 +37,7 @@ export const AppContextProvider = ({ children }) => {
   // Fetch user auth status and cart items
   const fetchUser = async () => {
     try {
-      const { data } = await axios.get("/api/user/is-auth");
+      const { data } = await api.get("/api/user/is-auth");
       if (data.success) {
         setUser(data.user);
         setCartItems(data.user.cartItems);
@@ -56,7 +56,7 @@ export const AppContextProvider = ({ children }) => {
 
     setAddressesLoading(true);
     try {
-      const { data } = await axios.get("/api/address/get", {
+      const { data } = await api.get("/api/address/get", {
         params: { userId: targetUserId },
       });
 
@@ -81,7 +81,7 @@ export const AppContextProvider = ({ children }) => {
     }
 
     try {
-      const { data } = await axios.post("/api/address/add", {
+      const { data } = await api.post("/api/address/add", {
         address: addressData,
         userId: user._id,
       });
@@ -107,7 +107,7 @@ export const AppContextProvider = ({ children }) => {
   const fetchProducts = async () => {
     setProductsLoading(true);
     try {
-      const { data } = await axios.get("/api/product/list");
+      const { data } = await api.get("/api/product/list");
       if (data.success) {
         if (Array.isArray(data.products) && data.products.length > 0) {
           setProducts(data.products);
@@ -182,7 +182,7 @@ const getCartCount = () => {
   useEffect(() => {
     const updateCart = async () => {
       try {
-        const { data } = await axios.post("/api/cart/update", {
+        const { data } = await api.post("/api/cart/update", {
           userId: user._id,
           cartItems,
         });
@@ -258,7 +258,6 @@ const getCartCount = () => {
     toggleDarkMode,
     getCartCount,
     getCartAmount,
-    axios,
     fetchProducts,
     handleQuantityChange,
     setCartItems,

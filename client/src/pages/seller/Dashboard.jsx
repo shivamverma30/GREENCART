@@ -2,15 +2,16 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useAppContext } from "../../context/AppContext";
 import GlassCard from "../../components/ui/GlassCard";
 import SectionHeader from "../../components/ui/SectionHeader";
+import api from "../../utils/api";
 
 const Dashboard = () => {
-  const { products, axios, currency } = useAppContext();
+  const { products, currency } = useAppContext();
   const [orders, setOrders] = useState([]);
 
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const { data } = await axios.get("/api/order/seller");
+        const { data } = await api.get("/api/order/seller");
         if (data.success) {
           setOrders(data.orders || []);
         }
@@ -20,7 +21,7 @@ const Dashboard = () => {
     };
 
     fetchOrders();
-  }, [axios]);
+  }, []);
 
   const metrics = useMemo(() => {
     const totalRevenue = orders.reduce((sum, order) => sum + (order.amount || 0), 0);

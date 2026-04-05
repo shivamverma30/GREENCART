@@ -6,6 +6,7 @@ import { useLocation } from 'react-router-dom';
 import Button from '../components/ui/Button';
 import EmptyState from '../components/ui/EmptyState';
 import { getProductImage } from '../utils/image';
+import api from '../utils/api';
 
 const loadRazorpayScript = () => new Promise((resolve) => {
   if (window.Razorpay) {
@@ -32,7 +33,6 @@ const Cart = () => {
     removeFromCart,
     handleQuantityChange,
     setCartItems,
-    axios,
     addresses,
     addressesLoading,
     fetchAddresses,
@@ -76,7 +76,7 @@ const Cart = () => {
       setIsPlacingOrder(true);
 
       if (paymentOption === "COD") {
-        const { data } = await axios.post('/api/order/cod', {
+        const { data } = await api.post('/api/order/cod', {
           userId: user._id,
           items: cartArray.map(item => ({ product: item._id, quantity: item.quantity })),
           address: selectedAddress._id,
@@ -96,7 +96,7 @@ const Cart = () => {
           return;
         }
 
-        const { data } = await axios.post('/api/payment/create-order', {
+        const { data } = await api.post('/api/payment/create-order', {
           userId: user._id,
           items: cartArray.map(item => ({ product: item._id, quantity: item.quantity })),
           address: selectedAddress._id,
@@ -114,7 +114,7 @@ const Cart = () => {
             order_id: data.order_id,
             handler: async (response) => {
               try {
-                const verifyResponse = await axios.post('/api/payment/verify', {
+                const verifyResponse = await api.post('/api/payment/verify', {
                   razorpay_payment_id: response.razorpay_payment_id,
                   razorpay_order_id: response.razorpay_order_id,
                   razorpay_signature: response.razorpay_signature,

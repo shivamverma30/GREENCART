@@ -4,6 +4,7 @@ import { assets } from '../assets/assets';
 import { useAppContext } from '../context/AppContext';
 import toast from 'react-hot-toast';
 import Button from './ui/Button';
+import api from '../utils/api';
 
 const Navbar = () => {
   const [open, setOpen] = React.useState(false);
@@ -18,13 +19,12 @@ const Navbar = () => {
     setSearchQuery,
     isDarkMode,
     toggleDarkMode,
-    getCartCount,
-    axios
+    getCartCount
   } = useAppContext();
 
   const logout = async () => {
     try {
-      const {data} = await axios.get('/api/user/logout')
+      const {data} = await api.get('/api/user/logout')
       if (data.success) {
         toast.success(data.message)
          setUser(null);

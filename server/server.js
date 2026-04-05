@@ -19,16 +19,32 @@ await connectDB()
 await connectCloudinary()
 
 //allow mutiple origins 
-const allowedOrigins=['http://localhost:5173','https://greencart-three-iota.vercel.app'];
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'https://greencart.vercel.app',
+  'https://greencart-three-iota.vercel.app',
+  process.env.FRONTEND_URL,
+].filter(Boolean);
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Allow non-browser requests and approved browser origins.
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true,
+};
 
 //Middleware configuration 
 app.post('/api/payment/webhook', express.raw({ type: 'application/json' }), razorpayWebhookHandler);
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({
-  origin: allowedOrigins,
-  credentials: true
-}));
+app.options(/.*/, cors(corsOptions));
 
 
 

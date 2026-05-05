@@ -3,12 +3,12 @@ import { NavLink } from 'react-router-dom';
 import { assets } from '../assets/assets';
 import { useAppContext } from '../context/AppContext';
 import toast from 'react-hot-toast';
-import Button from './ui/Button';
 import api from '../utils/api';
 
 const Navbar = () => {
   const [open, setOpen] = React.useState(false);
   const [dropdownOpen, setDropdownOpen] = React.useState(false);
+  const [scrolled, setScrolled] = React.useState(false);
   const closeTimeoutRef = React.useRef(null);
   const {
     user,
@@ -44,6 +44,14 @@ const Navbar = () => {
   }, [searchQuery]);
 
   useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
     return () => {
       if (closeTimeoutRef.current) {
         clearTimeout(closeTimeoutRef.current);
@@ -69,7 +77,9 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="navbar-shell sticky top-0 z-40 flex items-center justify-between px-6 py-4 md:px-16 lg:px-24 xl:px-32 transition-all">
+    <nav className={`navbar-shell fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-16 lg:px-24 xl:px-32 transition-all duration-300 ${
+      scrolled ? 'navbar-scrolled' : 'navbar-default'
+    }`}>
       <NavLink to='/' onClick={() => setOpen(false)}>
         <span className='logo-wrap'>
           <img className="h-9" src={isDarkMode ? assets.logo_dark : assets.logo} alt="GreenCart logo" />
@@ -93,15 +103,21 @@ const Navbar = () => {
           <img src={assets.search_icon} alt="search" className='icon-theme w-4 h-4' />
         </div>
 
-        <Button variant='muted' onClick={toggleDarkMode} className='rounded-full px-3 py-1.5 text-xs'>
-          {isDarkMode ? '☀️ Light Mode' : '🌙 Dark Mode'}
-        </Button>
+        <button 
+          onClick={toggleDarkMode} 
+          className='dark-mode-toggle rounded-full px-3 py-1.5 text-lg'
+          title={isDarkMode ? 'Light mode' : 'Dark mode'}
+        >
+          <span className={`inline-block transition-transform duration-300 ${isDarkMode ? 'rotate-180' : 'rotate-0'}`}>
+            {isDarkMode ? '☀️' : '🌙'}
+          </span>
+        </button>
 
         <div onClick={() => navigate("/cart")} className="cart-icon-shell relative cursor-pointer">
           <img src={isDarkMode ? assets.nav_cart_icon_dark : assets.nav_cart_icon} alt="cart" className='w-6' />
-          <button className="absolute -top-2 -right-3 text-xs text-white bg-primary w-[18px] h-[18px] rounded-full shadow">
+          <span className="absolute -top-2 -right-3 text-xs text-white bg-primary w-[18px] h-[18px] rounded-full shadow flex items-center justify-center font-semibold text-[10px]">
             {getCartCount()}
-          </button>
+          </span>
         </div>
 
         {!user ? (
@@ -135,9 +151,9 @@ const Navbar = () => {
       <div className='flex items-center gap-6 sm:hidden'>
         <div onClick={() => navigate("/cart")} className="cart-icon-shell relative cursor-pointer">
           <img src={isDarkMode ? assets.nav_cart_icon_dark : assets.nav_cart_icon} alt="cart" className='w-6' />
-          <button className="absolute -top-2 -right-3 text-xs text-white bg-primary w-[18px] h-[18px] rounded-full">
+          <span className="absolute -top-2 -right-3 text-xs text-white bg-primary w-[18px] h-[18px] rounded-full flex items-center justify-center font-semibold text-[10px]">
             {getCartCount()}
-          </button>
+          </span>
         </div>
 
         <button onClick={() => setOpen(!open)} aria-label="Menu">
@@ -158,9 +174,15 @@ const Navbar = () => {
             />
             <img src={assets.search_icon} alt="search" className='icon-theme w-4 h-4' />
           </div>
-          <Button variant='muted' onClick={toggleDarkMode} className='rounded-full px-3 py-1.5 text-xs'>
-            {isDarkMode ? '☀️ Light Mode' : '🌙 Dark Mode'}
-          </Button>
+          <button 
+            onClick={toggleDarkMode} 
+            className='dark-mode-toggle rounded-full px-3 py-1.5 text-lg w-full flex items-center justify-center'
+            title={isDarkMode ? 'Light mode' : 'Dark mode'}
+          >
+            <span className={`inline-block transition-transform duration-300 ${isDarkMode ? 'rotate-180' : 'rotate-0'}`}>
+              {isDarkMode ? '☀️' : '🌙'}
+            </span>
+          </button>
           <NavLink to='/' onClick={() => setOpen(false)}>Home</NavLink>
           <NavLink to='/products' onClick={() => setOpen(false)}>All Product</NavLink>
           {user && (
